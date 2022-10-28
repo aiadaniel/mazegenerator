@@ -16,7 +16,7 @@ class LineBorder : public CellBorder {
   LineBorder(double, double, double, double);
   LineBorder(std::tuple<double, double, double, double>);
 
- protected:
+ public:
   double x1_, y1_, x2_, y2_;
 };
 
@@ -26,8 +26,8 @@ class ArcBorder : public CellBorder {
   virtual std::string SVGPrintString(const std::string&) const;
   ArcBorder(double, double, double, double, double);
 
- protected:
-  double cx_, cy_, r_, theta1_, theta2_;
+ public:
+  double cx_, cy_, r_, theta1_, theta2_; // theta 角度
 };
 
 #endif /* end of include guard: CELLBORDER_H */

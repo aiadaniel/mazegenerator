@@ -42,5 +42,5 @@ std::string ArcBorder::SVGPrintString(const std::string& color) const {
          std::to_string(r_ * 30) + ", 0, 0, 0, " + std::to_string(x1 * 30) +
          " " + std::to_string(y1 * 30) + "\" stroke=\"" + color +
          "\" stroke-linecap=\"round\" stroke-width=\"3\" "
-         "fill=\"none\"/>";
+         "fill=\"none\"/>"; // 可参考svg path命令： https://zhuanlan.zhihu.com/p/35170350
 }

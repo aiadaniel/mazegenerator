@@ -12,7 +12,8 @@ int RectangularMaze::VertexIndex(int row, int column) {
 void RectangularMaze::InitialiseGraph() {
   Maze::InitialiseGraph();
 
-  // Lower and upper boundaries
+  // 2个顶点确定一条边。 左下角为（0，0）
+  // Lower and upper boundaries     adjacencylist_ => std::vector<std::vector<Edge>>
   for (int i = 0; i < width_; ++i) {
     adjacencylist_[VertexIndex(0, i)].push_back(
         {-1, std::make_shared<LineBorder>(i, 0, i + 1, 0)});

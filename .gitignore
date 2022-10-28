@@ -5,3 +5,7 @@ tags
 *.o
 examples/*_*.png
 examples/*_*.svg
+
+.vscode
+# *.svg
+# *.xlsx

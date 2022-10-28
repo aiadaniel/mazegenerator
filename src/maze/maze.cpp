@@ -3,56 +3,107 @@
 #include <fstream>
 #include <iostream>
 #include "depthfirstsearch.h"
+#include <typeinfo>
+#include "rectangularmaze.h"
+#include "circularmaze.h"
+#include "circularhexagonmaze.h"
 
 Maze::Maze(int vertices, int startvertex, int endvertex)
     : vertices_(vertices), startvertex_(startvertex), endvertex_(endvertex) {}
 
-void Maze::InitialiseGraph() {
+void Maze::InitialiseGraph()
+{
   adjacencylist_.clear();
-  adjacencylist_.resize(vertices_);
+  adjacencylist_.resize(vertices_); // vector
 }
 
-void Maze::GenerateMaze(SpanningtreeAlgorithm* algorithm) {
-  auto spanningtree = algorithm->SpanningTree(vertices_, adjacencylist_);
+void Maze::GenerateMaze(SpanningtreeAlgorithm *algorithm)
+{
+  // 思路： 生成基础整图 => 生成树算法（格子连通） =》 生成解决方案 =》 根据方案移除边形成通道
+  auto spanningtree = algorithm->SpanningTree(vertices_, adjacencylist_); // 格子数 整图
+  // lxm
+  std::cout << "get spanningtree: " << std::endl;
+  for (const auto &i : spanningtree)
+  {
+    std::cout << i.first << " " << i.second << std::endl;
+  }
+  // end lxm
+
   Solve(spanningtree);
+
+  // lxm
+  std::cout << "get solution: " << std::endl;
+  for (const auto &i : solution_)
+  { // Edge  std::tuple<int, std::shared_ptr<CellBorder>>
+    for (const auto &j : i)
+    {
+      auto t0 = std::get<0>(j);
+      std::shared_ptr<CellBorder> t1 = std::get<1>(j);
+      if (typeid(*t1) == typeid(LineBorder))
+      {
+        auto tt1 = dynamic_cast<LineBorder *>(t1.get());
+        std::cout << "idx " << t0 << " border:(" << tt1->x1_ << "," << tt1->y1_ << ")  (" << tt1->x2_ << "," << tt1->y2_ << ")" << std::endl;
+      }
+      if (typeid(*t1) == typeid(ArcBorder))
+      {
+        auto tt1 = dynamic_cast<ArcBorder *>(t1.get());
+        std::cout << "idx " << t0 << " cicle:(" << tt1->cx_ << "," << tt1->cy_ << "  r " << tt1->r_ << ")"
+                  << " theta1: " << tt1->theta1_ << " theta2: " << tt1->theta2_ << std::endl;
+      }
+    }
+  }
+  // end lxm
+
   RemoveBorders(spanningtree);
 }
 
-void Maze::Solve(const std::vector<std::pair<int, int>>& edges) {
+void Maze::Solve(const std::vector<std::pair<int, int>> &edges)
+{
   Graph spanningtreegraph(vertices_);
-  for (const auto& [u, v] : edges) {
+  for (const auto &[u, v] : edges)
+  {
     spanningtreegraph[u].push_back(
         *std::find_if(adjacencylist_[u].begin(), adjacencylist_[u].end(),
-                      [v = v](const Edge& e) { return std::get<0>(e) == v; }));
+                      [v = v](const Edge &e)
+                      { return std::get<0>(e) == v; }));
     spanningtreegraph[v].push_back(
         *std::find_if(adjacencylist_[v].begin(), adjacencylist_[v].end(),
-                      [u = u](const Edge& e) { return std::get<0>(e) == u; }));
+                      [u = u](const Edge &e)
+                      { return std::get<0>(e) == u; }));
   }
 
   DepthFirstSearch D;
   auto parent = D.Solve(vertices_, spanningtreegraph, startvertex_);
   solution_ = Graph(vertices_);
-  for(int u = endvertex_; parent[u]!=u; u=parent[u]) {
+  for (int u = endvertex_; parent[u] != u; u = parent[u])
+  {
     solution_[u].push_back(*std::find_if(
         spanningtreegraph[u].begin(), spanningtreegraph[u].end(),
-        [u, &parent](const Edge& e) { return std::get<0>(e) == parent[u]; }));
+        [u, &parent](const Edge &e)
+        { return std::get<0>(e) == parent[u]; }));
   }
 }
 
-void Maze::RemoveBorders(const std::vector<std::pair<int, int>>& edges) {
-  for (const auto& [u, v] : edges) {
+void Maze::RemoveBorders(const std::vector<std::pair<int, int>> &edges)
+{
+  for (const auto &[u, v] : edges)
+  {
     adjacencylist_[u].erase(
         std::find_if(adjacencylist_[u].begin(), adjacencylist_[u].end(),
-                     [v = v](const Edge& e) { return std::get<0>(e) == v; }));
+                     [v = v](const Edge &e)
+                     { return std::get<0>(e) == v; })); // Edge: {int, Border}
     adjacencylist_[v].erase(
         std::find_if(adjacencylist_[v].begin(), adjacencylist_[v].end(),
-                     [u = u](const Edge& e) { return std::get<0>(e) == u; }));
+                     [u = u](const Edge &e)
+                     { return std::get<0>(e) == u; }));
   }
 }
 
-void Maze::PrintMazeGnuplot(const std::string& outputprefix, bool solution) const {
+void Maze::PrintMazeGnuplot(const std::string &outputprefix, bool solution) const
+{
   std::ofstream gnuplotfile(outputprefix + ".plt");
-  if (!gnuplotfile) {
+  if (!gnuplotfile)
+  {
     std::cerr << "Error opening " << outputprefix << ".plt for writing.\n";
     std::cerr << "Terminating.";
     exit(1);
@@ -78,8 +129,10 @@ void Maze::PrintMazeGnuplot(const std::string& outputprefix, bool solution) cons
 
   gnuplotfile << "set output '" << outputprefix << ".png'\n";
   gnuplotfile << "set multiplot\n";
-  for (int i = 0; i < vertices_; ++i) {
-    for (const auto& edge : adjacencylist_[i]) {
+  for (int i = 0; i < vertices_; ++i)
+  {
+    for (const auto &edge : adjacencylist_[i])
+    {
       if (std::get<0>(edge) < i)
         gnuplotfile << std::get<1>(edge)->GnuplotPrintString("black") << "\n";
     }
@@ -90,15 +143,17 @@ void Maze::PrintMazeGnuplot(const std::string& outputprefix, bool solution) cons
   gnuplotfile << "set output\n";
 }
 
-void Maze::PrintMazeSVG(const std::string& outputprefix, bool solution) const {
+void Maze::PrintMazeSVG(const std::string &outputprefix, bool solution) const
+{
   std::ofstream svgfile(outputprefix + ".svg");
-  if (!svgfile) {
+  if (!svgfile)
+  {
     std::cerr << "Error opening " << outputprefix << ".svg for writing.\n";
     std::cerr << "Terminating.";
     exit(1);
   }
   double xmin, ymin, xmax, ymax;
-  std::tie(xmin, ymin, xmax, ymax) = GetCoordinateBounds();
+  std::tie(xmin, ymin, xmax, ymax) = GetCoordinateBounds(); // std::tie 创建左值引用的 tuple，或将 tuple 解包为独立对象
   int xresolution = (xmax - xmin + 2) * 30,
       yresolution = (ymax - ymin + 2) * 30;
 
@@ -110,9 +165,12 @@ void Maze::PrintMazeSVG(const std::string& outputprefix, bool solution) const {
           << "\" width=\"" << xresolution << "\" height=\"" << yresolution
           << "\" fill=\"white\"/>" << std::endl;
 
-  for (int i = 0; i < vertices_; ++i) {
-    for (const auto& edge : adjacencylist_[i]) {
-      if (std::get<0>(edge) < i) {
+  for (int i = 0; i < vertices_; ++i)
+  {
+    for (const auto &edge : adjacencylist_[i])
+    {
+      if (std::get<0>(edge) < i)
+      {
         svgfile << std::get<1>(edge)->SVGPrintString("black") << "\n";
       }
     }

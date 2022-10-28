@@ -4,12 +4,13 @@
 #include "spanningtreealgorithm.h"
 #include <vector>
 
-class DepthFirstSearch : public SpanningtreeAlgorithm {
- public:
+class DepthFirstSearch : public SpanningtreeAlgorithm
+{
+public:
   std::vector<std::pair<int, int>> SpanningTree(int, const Graph &);
-  std::vector<int> Solve(int, const Graph&, int);
+  std::vector<int> Solve(int, const Graph &, int);
 
- private:
+private:
   std::vector<int> parent;
   void DFS(int, const Graph &);
 };

@@ -8,7 +8,7 @@
 
 typedef std::tuple<int, std::shared_ptr<CellBorder>> Edge;
 typedef std::vector<std::vector<Edge>> Graph;
-
+// 生成树  抽象类，其他几个算法均继承自它
 class SpanningtreeAlgorithm {
  public:
   SpanningtreeAlgorithm();
@@ -16,8 +16,8 @@ class SpanningtreeAlgorithm {
 
  protected:
   std::vector<std::pair<int, int>> spanningtree;
-  std::random_device randomdevice;
-  std::mt19937 generator;
+  std::random_device randomdevice;//真随机数
+  std::mt19937 generator;//大范围随机数生成（对比rand）
 };
 
 #endif /* end of include guard: SPANNINGTREEALGORITHM_H */
