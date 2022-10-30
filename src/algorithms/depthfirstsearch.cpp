@@ -15,7 +15,7 @@ std::vector<std::pair<int, int>> DepthFirstSearch::SpanningTree(
 void DepthFirstSearch::DFS(int vertex, const Graph &adjacencylist)
 {
   std::vector<int> nodeorder(adjacencylist[vertex].size());
-  std::iota(nodeorder.begin(), nodeorder.end(), 0);
+  std::iota(nodeorder.begin(), nodeorder.end(), 0);//用一个从value递增的数列给[first, last)的容器赋值
   shuffle(nodeorder.begin(), nodeorder.end(), generator); //打乱重排
 
   for (auto index : nodeorder)

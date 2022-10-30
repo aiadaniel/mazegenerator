@@ -59,26 +59,26 @@ void Maze::GenerateMaze(SpanningtreeAlgorithm *algorithm)
 
 void Maze::Solve(const std::vector<std::pair<int, int>> &edges)
 {
-  Graph spanningtreegraph(vertices_);
-  for (const auto &[u, v] : edges)
+  Graph spgraph(vertices_);
+  for (const auto &[u, v] : edges)//u v是格子
   {
-    spanningtreegraph[u].push_back(
+    spgraph[u].push_back(
         *std::find_if(adjacencylist_[u].begin(), adjacencylist_[u].end(),
                       [v = v](const Edge &e)
                       { return std::get<0>(e) == v; }));
-    spanningtreegraph[v].push_back(
+    spgraph[v].push_back(
         *std::find_if(adjacencylist_[v].begin(), adjacencylist_[v].end(),
                       [u = u](const Edge &e)
                       { return std::get<0>(e) == u; }));
   }
 
   DepthFirstSearch D;
-  auto parent = D.Solve(vertices_, spanningtreegraph, startvertex_);
+  auto parent = D.Solve(vertices_, spgraph, startvertex_);
   solution_ = Graph(vertices_);
   for (int u = endvertex_; parent[u] != u; u = parent[u])
   {
     solution_[u].push_back(*std::find_if(
-        spanningtreegraph[u].begin(), spanningtreegraph[u].end(),
+        spgraph[u].begin(), spgraph[u].end(),
         [u, &parent](const Edge &e)
         { return std::get<0>(e) == parent[u]; }));
   }
