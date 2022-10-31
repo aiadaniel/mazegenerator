@@ -28,7 +28,7 @@ void RectangularMaze::InitialiseGraph() {
       adjacencylist_[VertexIndex(i, 0)].push_back(
           {-1, std::make_shared<LineBorder>(0, i, 0, i + 1)});
     if (i != height_ - 1)
-      adjacencylist_[VertexIndex(i, 0)].push_back(
+      adjacencylist_[VertexIndex(i, width_)].push_back(
           {-1, std::make_shared<LineBorder>(width_, i, width_, i + 1)});
   }
 

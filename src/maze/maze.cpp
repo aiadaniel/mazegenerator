@@ -28,10 +28,10 @@ void Maze::GenerateMaze(SpanningtreeAlgorithm *algorithm)
     std::cout << i.first << " " << i.second << std::endl;
   }
   // end lxm
-
   Solve(spanningtree);
 
   // lxm
+  std::cout << "============================" << std::endl;
   std::cout << "get solution: " << std::endl;
   for (const auto &i : solution_)
   { // Edge  std::tuple<int, std::shared_ptr<CellBorder>>
@@ -42,7 +42,7 @@ void Maze::GenerateMaze(SpanningtreeAlgorithm *algorithm)
       if (typeid(*t1) == typeid(LineBorder))
       {
         auto tt1 = dynamic_cast<LineBorder *>(t1.get());
-        std::cout << "idx " << t0 << " border:(" << tt1->x1_ << "," << tt1->y1_ << ")  (" << tt1->x2_ << "," << tt1->y2_ << ")" << std::endl;
+        std::cout << "idx " << t0 << std::endl;
       }
       if (typeid(*t1) == typeid(ArcBorder))
       {
@@ -82,6 +82,14 @@ void Maze::Solve(const std::vector<std::pair<int, int>> &edges)
         [u, &parent](const Edge &e)
         { return std::get<0>(e) == parent[u]; }));
   }
+  // lxm
+  std::cout << "============================" << std::endl;
+  std::cout << "parent: " << std::endl;
+  for (auto item : parent) {
+    std::cout << item << " ";
+  }
+  std::cout << std::endl;
+  // end lxm
 }
 
 void Maze::RemoveBorders(const std::vector<std::pair<int, int>> &edges)

@@ -7,5 +7,5 @@ examples/*_*.png
 examples/*_*.svg
 
 .vscode
-# *.svg
-# *.xlsx
+*.svg
+*.xlsx
